@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"os"
+
 	floats "github.com/gonum/floats"
 )
 
@@ -131,11 +133,36 @@ func (r *Route) GetCopy() (copy *Route) {
 	return copy
 }
 
-// UpdateCost recalculates Cities route cost
-func (r *Route) UpdateCost(m *Map) {
+// CalculateCost calculates cost of Route r based on r.Cities
+func (r *Route) CalculateCost(m *Map) {
 	r.Cost = 0.0
 	for i, c := range r.Cities[0 : len(r.Cities)-1] {
 		r.Cost += m.distances[c][r.Cities[i+1]]
+	}
+}
+
+// Swap swaps two cities and updates cost
+func (r *Route) Swap(m *Map, t1, t2 int) {
+	r.Cost = r.Cost -
+		m.distances[r.Cities[t1-1]][r.Cities[t1]] -
+		m.distances[r.Cities[t1]][r.Cities[t1+1]] +
+		m.distances[r.Cities[t1-1]][r.Cities[t2]] +
+		m.distances[r.Cities[t2]][r.Cities[t1+1]] -
+		m.distances[r.Cities[t2-1]][r.Cities[t2]] -
+		m.distances[r.Cities[t2]][r.Cities[t2+1]] +
+		m.distances[r.Cities[t2-1]][r.Cities[t1]] +
+		m.distances[r.Cities[t1]][r.Cities[t2+1]]
+
+	r.Cities[t1] = r.Cities[t1] ^ r.Cities[t2]
+	r.Cities[t2] = r.Cities[t2] ^ r.Cities[t1]
+	r.Cities[t1] = r.Cities[t1] ^ r.Cities[t2]
+}
+
+// PrintResult prints distance to stdout and path to stderr
+func (r *Route) PrintResult() {
+	fmt.Println(r.Cost)
+	for _, c := range r.Cities {
+		fmt.Fprintln(os.Stderr, c+1)
 	}
 }
 
@@ -172,12 +199,12 @@ func InitialRoute(m *Map) (r *Route) {
 	k := 0
 	for i := 1; i < m.size; i++ {
 		r.Cities[i] = floats.MinIdx(d[k])
+		r.Cost += m.distances[k][r.Cities[i]]
 		k = r.Cities[i]
 		d[k][0] = math.Inf(1)
 		for v := 0; v <= i; v++ {
 			d[k][r.Cities[v]] = math.Inf(1)
 		}
-		r.Cost += m.distances[r.Cities[i-1]][k]
 	}
 
 	r.Cost += m.distances[k][0]
