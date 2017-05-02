@@ -25,3 +25,7 @@ _testmain.go
 
 # Ignore txt test data
 data/*.txt
+
+.idea/
+
+main
