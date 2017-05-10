@@ -1,6 +1,9 @@
 NAME = main
 
-all: clean build
+all: clean packages build
+
+packages:
+	go get github.com/gonum/floats
 
 build:
 	go build ${NAME}.go
