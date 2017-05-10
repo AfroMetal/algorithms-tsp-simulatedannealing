@@ -5,12 +5,11 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 	"strings"
-
-	"os"
-
-	floats "github.com/gonum/floats"
+	
+	"github.com/gonum/floats"
 )
 
 type coordinatesList [][2]float64
@@ -48,7 +47,7 @@ func readXY(scan *bufio.Scanner) (coord [2]float64, err error) {
 
 // ParseFrom parses Map using provided Scanner, first line have to be number of cities,
 // next lines have to contain index with two coordinates separated by whitespace.
-func ParseFrom(scanner *bufio.Scanner) (m *Map) {
+func ParseFrom(scanner *bufio.Scanner) (m *Map, t int) {
 	scanner.Scan()
 	n, err := strconv.Atoi(scanner.Text())
 	if err != nil {
@@ -79,8 +78,11 @@ func ParseFrom(scanner *bufio.Scanner) (m *Map) {
 			}
 		}
 	}
+	
+	scanner.Scan()
+	t, err = strconv.Atoi(scanner.Text())
 
-	return m
+	return
 }
 
 // Size returns amount of cities on map
