@@ -1,14 +1,5 @@
-NAME = main
+all: julia
 
-all: clean packages build
-
-packages:
-	go get github.com/gonum/floats
-
-build:
-	go build ${NAME}.go
-
-clean:
-	rm -f ${NAME}
-
-.PHONY: build clean
+julia:
+	# run to precompile things that will be needed
+	julia simulated_annealing.jl 1 < dummy
